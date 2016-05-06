@@ -291,6 +291,8 @@ typedef void (*ReorderBufferMessageCB) (
 												   bool transactional,
 												   const char *prefix, Size sz,
 												   const char *message);
+/* callback signature for check decoding status */
+typedef bool (*ReorderBufferIsActive) (void);
 
 struct ReorderBuffer
 {
@@ -319,6 +321,11 @@ struct ReorderBuffer
 	ReorderBufferApplyChangeCB apply_change;
 	ReorderBufferCommitCB commit;
 	ReorderBufferMessageCB message;
+
+	/*
+	 * Callback to define status of decoding. Return false if decoding not necessary continue
+	 */
+	ReorderBufferIsActive is_active;
 
 	/*
 	 * Pointer that will be passed untouched to the callbacks.

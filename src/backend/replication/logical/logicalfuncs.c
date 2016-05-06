@@ -104,6 +104,17 @@ LogicalOutputWrite(LogicalDecodingContext *ctx, XLogRecPtr lsn, TransactionId xi
 	p->returned_rows++;
 }
 
+/**
+ * Stab function that necessary for LogicalDecondign context.
+ * Function always return true and it means that decoding WALs
+ * can't be interrupt in contrast of logical replication.
+ */
+static bool
+LogicalContextAlwaysActive(void)
+{
+	return true;
+}
+
 static void
 check_permissions(void)
 {
@@ -243,7 +254,9 @@ pg_logical_slot_get_changes_guts(FunctionCallInfo fcinfo, bool confirm, bool bin
 									options,
 									logical_read_local_xlog_page,
 									LogicalOutputPrepareWrite,
-									LogicalOutputWrite);
+									LogicalOutputWrite,
+									LogicalContextAlwaysActive /* converting to Datum(sql api) can't be interrupted in contrast of replication*/
+									);
 
 		MemoryContextSwitchTo(oldcontext);
 
